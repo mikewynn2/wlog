@@ -1,4 +1,38 @@
 import sqlite3
+from exceptions import UserExists
+import datetime
+import os.path
+
+
+class DBEngine(object):
+    def __init__(self):
+        super(DBEngine, self).__init__()
+
+        # if the database was not created yet, create a new db file
+        if not os.path.isfile('wlog.db'):
+            init_db()
+
+        self.conn = sqlite3.connect('wlog.db')
+
+    def create_user(self, username, email, first_name='', last_name=''):
+        try:
+            c = self.conn.cursor()
+            c.execute(
+                """
+                INSERT INTO user (username, email, first_name, last_name, date_created)
+                          VALUES (?, ?, ?, ?, ?)
+                """, [
+                    username,
+                    email,
+                    first_name,
+                    last_name,
+                    datetime.datetime.utcnow().timestamp()
+                ]
+            )
+            self.conn.commit()
+            return c.lastrowid
+        except sqlite3.IntegrityError:
+            raise UserExists()
 
 
 def init_db(db_name=None):
