@@ -34,7 +34,7 @@ class DBEngine(object):
                 ]
             )
             self.conn.commit()
-            return c.lastrowid
+            return self.get_user(c.lastrowid)
         except sqlite3.IntegrityError:
             raise UserExists()
 
@@ -54,7 +54,7 @@ class DBEngine(object):
                 ]
             )
             self.conn.commit()
-            return c.lastrowid
+            return self.get_post(c.lastrowid)
         except Exception as e:
             print(e)
 
@@ -89,7 +89,7 @@ class DBEngine(object):
                     ]
                 )
             self.conn.commit()
-            return c.lastrowid
+            return self.get_comment(c.lastrowid)
         except Exception as e:
             print(e)
 
@@ -140,7 +140,7 @@ class DBEngine(object):
         try:
             c = self.conn.cursor()
             post = c.execute("""SELECT * FROM post WHERE id = ?;""", [post_id]).fetchone()
-
+            print('hi pave', post)
             return process_record(POST_COLUMNS, post)
         except Exception as e:
             print(e)
